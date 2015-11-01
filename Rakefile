@@ -5,7 +5,7 @@ PKG_NAME='dyndoc-ruby-exec'
 PKG_VERSION='0.1.0'
 
 PKG_FILES=FileList[
-    'lib/dyndoc-converter.rb','lib/dyndoc-software.rb',
+    'lib/dyndoc-converter.rb','lib/dyndoc-software.rb'
 ]
 
 spec = Gem::Specification.new do |s|
