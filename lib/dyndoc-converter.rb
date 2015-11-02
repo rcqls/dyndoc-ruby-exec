@@ -63,15 +63,19 @@ module Dyndoc
         end
       end
       if SOFTWARE[:pandoc]
+        ##DEBUG: p [:pandoc_soft, SOFTWARE[:pandoc]+" #{opt}"]
         if input
+          ##DEBUG: p [:pandoc_iput,input]
+          ##DEBUG: p [:pandoc_options, opt]
           Open3::popen3(SOFTWARE[:pandoc]+" #{opt}") do |stdin, stdout, stderr| 
             stdin.puts input 
             stdin.close
             output = stdout.read.strip 
           end
+          ##DEBUG: p [:pandoc_output,output]
           output
         else
-          #p SOFTWARE[:pandoc]+" #{opt}"
+          ##DEBUG: p SOFTWARE[:pandoc]+" #{opt}"
           system(SOFTWARE[:pandoc]+" #{opt}")
         end
       else
