@@ -113,7 +113,7 @@ module Dyndoc
 
     def Converter.asciidoctor(code)
       require 'asciidoctor'
-      Asciidoctor.convert(code)
+      Asciidoctor.convert(code,:attributes => {"icons" => "font"})
     end
 
     def Converter.convert(input,format,outputFormat,to_protect=nil)
