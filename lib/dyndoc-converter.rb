@@ -67,10 +67,10 @@ module Dyndoc
         if input
           ##DEBUG: p [:pandoc_iput,input]
           ##DEBUG: p [:pandoc_options, opt]
-          Open3::popen3(SOFTWARE[:pandoc]+" #{opt}") do |stdin, stdout, stderr| 
-            stdin.puts input 
+          Open3::popen3(SOFTWARE[:pandoc]+" #{opt}") do |stdin, stdout, stderr|
+            stdin.puts input
             stdin.close
-            output = stdout.read.strip 
+            output = stdout.read.strip
           end
           ##DEBUG: p [:pandoc_output,output]
           output
@@ -111,6 +111,11 @@ module Dyndoc
       end
     end
 
+    def Converter.asciidoctor(code)
+      require 'asciidoctor'
+      Asciidoctor.convert(code)
+    end
+
     def Converter.convert(input,format,outputFormat,to_protect=nil)
       ##
       format=format.to_s unless format.is_a? String
@@ -121,6 +126,8 @@ module Dyndoc
         ## Dyndoc.warn "code",[i,code,format,outputFormat]
         if i%2==0
           res << case format+outputFormat
+          when "adoc>html"
+            Dyndoc::Converter.asciidoctor(code)
           when "md>html"
             ##PandocRuby.new(code, :from => :markdown, :to => :html).convert
             Dyndoc::Converter.pandoc(code)
@@ -140,8 +147,8 @@ module Dyndoc
             # rc.to_html
             Dyndoc::Converter.pandoc(code,"-f textile -t html")
           when "txtl>tex"
-            # RedCloth.new(code).to_latex 
-            Dyndoc::Converter.pandoc(code,"-f textile -t latex")  
+            # RedCloth.new(code).to_latex
+            Dyndoc::Converter.pandoc(code,"-f textile -t latex")
           when "ttm>html"
             Dyndoc::Converter.ttm(code,"-e2 -r -y1 -L").gsub(/<mtable[^>]*>/,"<mtable>").gsub("\\ngtr","<mtext>&ngtr;</mtext>").gsub("\\nless","<mtext>&nless;</mtext>").gsub("&#232;","<mtext>&egrave;</mtext>")
           when "tex>odt"
@@ -151,7 +158,7 @@ module Dyndoc
             tmp
           when "tex>html"
             ##PandocRuby.new(code, :from => :markdown, :to => :html).convert
-            Dyndoc::Converter.pandoc(code,"--mathjax -f latex -t html")             
+            Dyndoc::Converter.pandoc(code,"--mathjax -f latex -t html")
           when "ttm>tex", "html>html",'tex>tex'
             code
           else
