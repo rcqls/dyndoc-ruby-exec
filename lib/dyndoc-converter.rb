@@ -11,8 +11,12 @@ require "open3"
 module Dyndoc
 
   def Dyndoc.which_path(bin)
-    cmd=`which #{bin}`.strip
-    cmd=DyndocMsys2.global_path_msys2mingw(cmd) if RUBY_PLATFORM =~ /mingw/
+    begin
+      cmd=`which #{bin}`.strip
+      cmd=DyndocMsys2.global_path_msys2mingw(cmd) if RUBY_PLATFORM =~ /mingw/
+    rescue
+      cmd=bin
+    end
     return cmd
   end
 
