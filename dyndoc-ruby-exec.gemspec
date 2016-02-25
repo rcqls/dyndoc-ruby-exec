@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rubygems/package_task'
 
 pkg_NAME='dyndoc-ruby-exec'
-pkg_VERSION='0.1.1'
+pkg_VERSION='0.1.2'
 
 pkg_FILES=FileList[
     'lib/dyndoc-converter.rb','lib/dyndoc-software.rb'
