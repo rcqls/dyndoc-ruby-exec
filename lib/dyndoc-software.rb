@@ -2,10 +2,18 @@ module Dyndoc
 
   SOFTWARE={}
 
+  def self.mingw32_software?
+    RUBY_PLATFORM=~/mingw32/
+  end
+
+  def self.scoop_install?
+    self.mingw32_software? and !(`where scoop`.strip.empty?)
+  end
+
   def self.software_init(force=false)
 
     unless SOFTWARE[:R]
-      if RUBY_PLATFORM=~/mingw32/
+      if self.mingw32_software?
         cmd=Dir[File.join(ENV["HomeDrive"],"Program Files","R","**","R.exe")]
         SOFTWARE[:R]=cmd[0] unless cmd.empty?
       else
@@ -15,7 +23,7 @@ module Dyndoc
     end
 
     unless SOFTWARE[:Rscript]
-      if RUBY_PLATFORM=~/mingw32/
+      if self.mingw32_software?
         cmd=Dir[File.join(ENV["HomeDrive"],"Program Files","R","**","Rscript.exe")]
         SOFTWARE[:Rscript]=cmd[0] unless cmd.empty?
       else
@@ -58,6 +66,19 @@ module Dyndoc
       SOFTWARE[:ttm]=cmd.strip.split(" ")[2] unless cmd.empty?
     end
 
+    unless SOFTWARE[:bash]
+      if self.scoop_install?
+        bash_path=File.expand_path('../../bin/bash.exe',`scoop which git`)
+        if File.exist? bash_path
+          bash_path
+        else # Needs to be in the PATH
+          "bash"
+        end
+      else
+        "/bin/bash"
+      end
+    end
+
   end
 
   def self.software
@@ -71,9 +92,17 @@ module Dyndoc
   def self.pdflatex
     # this has to be initialized each time you need pdflatex since TEXINPUTS could change!
     if ENV['TEXINPUTS']
-      "env TEXINPUTS=#{ENV['TEXINPUTS']}" + (RUBY_PLATFORM=~/mingw32/ ? "; " : " ") + SOFTWARE[:pdflatex]
+      "env TEXINPUTS=#{ENV['TEXINPUTS']}" + (self.mingw32_software? ? "; " : " ") + SOFTWARE[:pdflatex]
     else
       SOFTWARE[:pdflatex]
+    end
+  end
+
+  def self.bash(bash_path=nil)
+    bash_path # Needs to be in the PATH
+      return bash_path
+    else
+      SOFTWARE[:bash]
     end
   end
 

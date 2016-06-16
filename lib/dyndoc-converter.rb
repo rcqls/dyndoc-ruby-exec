@@ -127,7 +127,7 @@ module Dyndoc
       outputFormat=outputFormat.to_s unless outputFormat.is_a? String
       res=""
       input.split("__PROTECTED__FORMAT__").each_with_index do |code,i|
-        ## Dyndoc.warn "code",[i,code,format,outputFormat]
+        ##Dyndoc.warn "code",[i,code,format,outputFormat]
         if i%2==0
           res << case format+outputFormat
           when "adoc>html"
@@ -173,7 +173,7 @@ module Dyndoc
         else
           res << code
         end
-        #puts "res";p res
+        #Dyndoc.warn "res",res
       end
       return (to_protect ? "__PROTECTED__FORMAT__"+res+"__PROTECTED__FORMAT__": res)
     end
