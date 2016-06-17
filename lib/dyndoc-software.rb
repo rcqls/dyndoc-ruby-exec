@@ -99,7 +99,7 @@ module Dyndoc
   end
 
   def self.bash(bash_path=nil)
-    bash_path # Needs to be in the PATH
+    if bash_path # Needs to be in the PATH
       return bash_path
     else
       SOFTWARE[:bash]
