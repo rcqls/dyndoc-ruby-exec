@@ -54,8 +54,7 @@ module Dyndoc
       end
     end
 
-    def Converter.pandoc(input,opt='')
-      output = ''
+    def Converter.pandoc_available?
       unless SOFTWARE[:pandoc]
         if File.exist? File.join(ENV["HOME"],".cabal","bin","pandoc")
           SOFTWARE[:pandoc]=File.join(ENV["HOME"],".cabal","bin","pandoc")
@@ -66,7 +65,12 @@ module Dyndoc
           #SOFTWARE[:pandoc]=cmd.strip.split(" ")[2] unless cmd.empty?
         end
       end
-      if SOFTWARE[:pandoc]
+      SOFTWARE[:pandoc]
+    end
+
+    def Converter.pandoc(input,opt='')
+      output = ''
+      if Converter.pandoc_available?
         ##DEBUG: p [:pandoc_soft, SOFTWARE[:pandoc]+" #{opt}"]
         if input
           ##DEBUG: p [:pandoc_iput,input]
@@ -118,6 +122,31 @@ module Dyndoc
     def Converter.asciidoctor(code)
       require 'asciidoctor'
       Asciidoctor.convert(code,:attributes => {"icons" => "font"})
+    end
+
+    def Converter.redcarpet_engine
+      unless $$markdown
+        require 'redcarpet'
+        $$markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+      end
+      $$markdown
+    end
+
+    def Converter.redcarpet(code)
+        Converter.redcarpet_engine ? $$markdown.render(code) : ""
+    end
+
+    def Converter.markdown(code,engine = :pandoc)
+      if engine == :pandoc
+        if Dyndoc::Converter.pandoc_available?
+          Dyndoc::Converter.pandoc(code)
+        else
+          engine=:redcarpet
+        end
+      end
+      Converter.redcarpet(code) if engine == :redcarpet
+      ## default output if no engine found
+      ""
     end
 
     def Converter.convert(input,format,outputFormat,to_protect=nil)
