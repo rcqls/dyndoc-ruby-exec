@@ -125,28 +125,41 @@ module Dyndoc
     end
 
     def Converter.redcarpet_engine
-      unless $$markdown
+      unless @@markdown
         require 'redcarpet'
-        $$markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+        @@markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
       end
-      $$markdown
+      @@markdown
     end
 
     def Converter.redcarpet(code)
-        Converter.redcarpet_engine ? $$markdown.render(code) : ""
+        Dyndoc::Converter.redcarpet_engine ? @@markdown.render(code) : ""
     end
 
-    def Converter.markdown(code,engine = :pandoc)
-      if engine == :pandoc
+
+    def Converter.markdown_engine=(engine)
+       @@markdown_engine=engine unless Dyndoc::Converter.markdown_engine == engine
+
+    end
+
+    def Converter.markdown_engine
+      (@@markdown_engine ||= :pandoc)
+    end
+
+    def Converter.markdown(code)
+      if Dyndoc::Converter.markdown_engine == :pandoc
         if Dyndoc::Converter.pandoc_available?
-          Dyndoc::Converter.pandoc(code)
+          return Dyndoc::Converter.pandoc(code)
         else
-          engine=:redcarpet
+          Converter.markdown_engine=:redcarpet
         end
       end
-      Converter.redcarpet(code) if engine == :redcarpet
-      ## default output if no engine found
-      ""
+      if Dyndoc::Converter.markdown_engine == :redcarpet
+        Converter.redcarpet(code)
+      else
+        ## default output if no available engine found
+        ""
+      end
     end
 
     def Converter.convert(input,format,outputFormat,to_protect=nil)
@@ -163,7 +176,9 @@ module Dyndoc
             Dyndoc::Converter.asciidoctor(code)
           when "md>html"
             ##PandocRuby.new(code, :from => :markdown, :to => :html).convert
-            Dyndoc::Converter.pandoc(code)
+            tmp=Dyndoc::Converter.markdown(code)
+            Dyndoc.warn :res,[code,tmp]
+            tmp
           when "md>tex"
             #puts "latex documentclass";p Dyndoc::Utils.dyndoc_globvar("_DOCUMENTCLASS_")
             if Dyndoc::Utils.dyndoc_globvar("_DOCUMENTCLASS_")=="beamer"
