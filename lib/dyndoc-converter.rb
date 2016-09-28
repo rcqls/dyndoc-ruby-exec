@@ -124,6 +124,8 @@ module Dyndoc
       Asciidoctor.convert(code,:attributes => {"icons" => "font"})
     end
 
+    @@markdown=nil
+
     def Converter.redcarpet_engine
       unless @@markdown
         require 'redcarpet'
@@ -175,10 +177,12 @@ module Dyndoc
           when "adoc>html"
             Dyndoc::Converter.asciidoctor(code)
           when "md>html"
-            ##PandocRuby.new(code, :from => :markdown, :to => :html).convert
-            tmp=Dyndoc::Converter.markdown(code)
-            Dyndoc.warn :res,[code,tmp]
-            tmp
+            ## DEBUG MODE
+            ##tmp=Dyndoc::Converter.markdown(code)
+            ##Dyndoc.warn :res,[code,tmp]
+            ##tmp
+            ## Normal Mode
+            Dyndoc::Converter.markdown(code)
           when "md>tex"
             #puts "latex documentclass";p Dyndoc::Utils.dyndoc_globvar("_DOCUMENTCLASS_")
             if Dyndoc::Utils.dyndoc_globvar("_DOCUMENTCLASS_")=="beamer"
